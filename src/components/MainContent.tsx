@@ -3,7 +3,7 @@ import axios, { AxiosError } from "axios";
 
 const url =
   process.env.NODE_ENV === "production"
-    ? "https://alli-ben-maghfoor-pastebin.onrender.com"
+    ? "https://snip-snap-back.onrender.com"
     : "http://localhost:4000";
 
 interface PasteBinType {
