@@ -49,10 +49,6 @@ export default function MainContent(): JSX.Element {
       snap.body
     );
 
-    // useEffect(() => {
-    //   getSnipSnaps();
-    // }, [editSnipSnapText])
-
     const handleReadMore = (body: string) => {
       setFullBody(body.slice(sliceLength, body.length));
       if (fullBody.length > 0) {
@@ -95,7 +91,7 @@ export default function MainContent(): JSX.Element {
     };
     const handleSubmitComment = (id: number, comment: string) => {
       if (comment.length < 1) {
-        alert("you can't post an empty comment either bro omd...");
+        alert("you can't post an empty comment either bro omg...");
       } else {
         postComment(id, comment)
           .then(() => getAllComments())
@@ -169,7 +165,7 @@ export default function MainContent(): JSX.Element {
               More
             </button>
           )}
-          <button onClick={handleOpenComments}>Leave a comment</button>
+          <button onClick={handleOpenComments}>👀 comments</button>
           {comments.length > 0 && !CommsVis && (
             <button onClick={handleOpenComments}>View comments</button>
           )}
