@@ -103,8 +103,17 @@ export default function MainContent(): JSX.Element {
         setCommentBody("");
       }
     };
-
+    //GET Allcomments for a snip snap
+    const getAllComments = async () => {
+      try {
+        const response = await axios.get(url + `/comments`);
+        setAllComments(response.data);
+      } catch (error) {
+        console.error("Woops... issue with GET request: ", error);
+      }
+    };
     const handleOpenComments = () => {
+      getAllComments();
       setCommsVis(!CommsVis);
       setLeaveCommentVis(!leaveCommentVis);
     };
@@ -166,12 +175,6 @@ export default function MainContent(): JSX.Element {
             </button>
           )}
           <button onClick={handleOpenComments}>👀 comments</button>
-          {comments.length > 0 && !CommsVis && (
-            <button onClick={handleOpenComments}>View comments</button>
-          )}
-          {comments.length > 0 && CommsVis && (
-            <button onClick={handleOpenComments}>Hide Comments</button>
-          )}
         </span>
         {fullBody.length > 0 && (
           <button value={fullBody} onClick={() => handleReadMore(snap.body)}>
@@ -179,7 +182,7 @@ export default function MainContent(): JSX.Element {
           </button>
         )}
         <br />
-        {leaveCommentVis && (
+        {CommsVis && (
           <div>
             <textarea
               onChange={(e) => setCommentBody(e.target.value)}
@@ -193,28 +196,28 @@ export default function MainContent(): JSX.Element {
             >
               📩
             </button>
-          </div>
-        )}
-        {comments.length > 0 && CommsVis && (
-          <div>
-            <h3>Comments</h3>
-            {comments.map((el) => {
-              return (
-                <>
-                  <p key={el.comment_id}>
-                    {el.comment_body}
-                    <span>
-                      <button
-                        className="del-com-btn"
-                        onClick={() => handleDeleteCommentButton(el.comment_id)}
-                      >
-                        🗑️
-                      </button>
-                    </span>
-                  </p>
-                </>
-              );
-            })}
+            <div>
+              <h3>Comments</h3>
+              {comments.map((el) => {
+                return (
+                  <>
+                    <p key={el.comment_id}>
+                      {el.comment_body}
+                      <span>
+                        <button
+                          className="del-com-btn"
+                          onClick={() =>
+                            handleDeleteCommentButton(el.comment_id)
+                          }
+                        >
+                          🗑️
+                        </button>
+                      </span>
+                    </p>
+                  </>
+                );
+              })}
+            </div>
           </div>
         )}
         <hr />
@@ -225,7 +228,7 @@ export default function MainContent(): JSX.Element {
   useEffect(() => {
     getSnipSnaps();
     getAllComments();
-  }, [allData.length, allComments.length]);
+  }, []);
 
   //GET snipSnaps from API
   const getSnipSnaps = async () => {
@@ -233,16 +236,6 @@ export default function MainContent(): JSX.Element {
     try {
       const response = await axios.get(url + "/snip_snaps");
       setAllData(response.data);
-    } catch (error) {
-      console.error("Woops... issue with GET request: ", error);
-    }
-  };
-
-  //GET Allcomments from API
-  const getAllComments = async () => {
-    try {
-      const response = await axios.get(url + `/comments`);
-      setAllComments(response.data);
     } catch (error) {
       console.error("Woops... issue with GET request: ", error);
     }
