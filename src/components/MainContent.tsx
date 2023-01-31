@@ -6,50 +6,52 @@ const url =
     ? "https://snip-snap-back.onrender.com"
     : "http://localhost:4000";
 
-interface PasteBinType {
+interface SnipSnapType {
   id: number;
   date: Date;
   title: null | string;
   body: string;
 }
 
-interface PasteComment {
+interface SnipSnapComment {
   comment_id: number;
-  paste_id: number;
+  snipSnap_id: number;
   comment_body: string;
   date: Date;
 }
 
 export default function MainContent(): JSX.Element {
-  const [pasteBinBody, setPasteBinBody] = useState<string>("");
-  const [pasteBinTitle, setPasteBinTitle] = useState<string>("");
-  const [allData, setAllData] = useState<PasteBinType[]>([]);
-  const [allComments, setAllComments] = useState<PasteComment[]>([]);
+  const [snipSnapBody, setSnipSnapBody] = useState<string>("");
+  const [snipSnapTitle, setSnipSnapTitle] = useState<string>("");
+  const [allData, setAllData] = useState<SnipSnapType[]>([]);
+  const [allComments, setAllComments] = useState<SnipSnapComment[]>([]);
   //creating a function for individual snaps
   interface SnapProps {
-    snap: PasteBinType;
-    allCommProps: PasteComment[];
-    handleSubmitEditPaste: (id: number, message: string) => void;
+    snap: SnipSnapType;
+    allCommProps: SnipSnapComment[];
+    handleSubmitEditSnipSnap: (id: number, message: string) => void;
   }
 
   //creating a single component for an individual snap
   const SnapItem: React.FC<SnapProps> = (props: SnapProps) => {
     const sliceLength = 450;
-    const { snap, allCommProps, handleSubmitEditPaste } = props;
+    const { snap, allCommProps, handleSubmitEditSnipSnap } = props;
 
     const [commentBody, setCommentBody] = useState<string>("");
     const [leaveCommentVis, setLeaveCommentVis] = useState<boolean>(false);
     const [CommsVis, setCommsVis] = useState<boolean>(false);
-    const [comments, setComments] = useState<PasteComment[]>(
-      allCommProps.filter((el) => el.paste_id === snap.id)
+    const [comments, setComments] = useState<SnipSnapComment[]>(
+      allCommProps.filter((el) => el.snipSnap_id === snap.id)
     );
     const [fullBody, setFullBody] = useState("");
-    const [editPaste, setEditPaste] = useState<boolean>(false);
-    const [editPasteText, setEditePasteText] = useState<string>(snap.body);
+    const [editSnipSnap, setEditSnipSnap] = useState<boolean>(false);
+    const [editSnipSnapText, setEditeSnipSnapText] = useState<string>(
+      snap.body
+    );
 
     // useEffect(() => {
-    //   getPastes();
-    // }, [editPasteText])
+    //   getSnipSnaps();
+    // }, [editSnipSnapText])
 
     const handleReadMore = (body: string) => {
       setFullBody(body.slice(sliceLength, body.length));
@@ -70,21 +72,21 @@ export default function MainContent(): JSX.Element {
       deleteComment(id).then(() => getAllComments());
     };
 
-    //creating a function to handle deleting a paste and its comments
-    const deletePaste = async (id: number) => {
+    //creating a function to handle deleting a snip snap and its comments
+    const deleteSnipSnap = async (id: number) => {
       try {
-        await axios.delete(`${url}/pastes/${id}`);
+        await axios.delete(`${url}/snip_snaps/${id}`);
       } catch (error) {
         console.error(error);
       }
     };
-    const handleDeletePasteButton = (id: number) => {
-      deletePaste(id).then(() => getPastes());
+    const handleDeleteSnipSnapButton = (id: number) => {
+      deleteSnipSnap(id).then(() => getSnipSnaps());
     };
     const postComment = async (id: number, newComment: string) => {
       try {
         await axios.post(`${url}/comments`, {
-          pasteID: id,
+          snipSnapID: id,
           commentBody: newComment,
         });
       } catch (error) {
@@ -111,8 +113,8 @@ export default function MainContent(): JSX.Element {
       setLeaveCommentVis(!leaveCommentVis);
     };
 
-    const handleEditPasteButton = () => {
-      setEditPaste(true);
+    const handleEditSnipSnapButton = () => {
+      setEditSnipSnap(true);
     };
 
     return (
@@ -128,27 +130,29 @@ export default function MainContent(): JSX.Element {
           <span>
             <button
               className="del-com-btn"
-              onClick={() => handleDeletePasteButton(snap.id)}
+              onClick={() => handleDeleteSnipSnapButton(snap.id)}
             >
               ❌
             </button>
             <button
               className="del-com-btn"
-              onClick={() => handleEditPasteButton()}
+              onClick={() => handleEditSnipSnapButton()}
             >
               📝
             </button>
           </span>
         </p>
 
-        {editPaste ? (
+        {editSnipSnap ? (
           <>
             <textarea
-              value={editPasteText}
-              onChange={(e) => setEditePasteText(e.target.value)}
+              value={editSnipSnapText}
+              onChange={(e) => setEditeSnipSnapText(e.target.value)}
             ></textarea>
             <button
-              onClick={() => handleSubmitEditPaste(snap.id, editPasteText)}
+              onClick={() =>
+                handleSubmitEditSnipSnap(snap.id, editSnipSnapText)
+              }
             >
               save
             </button>
@@ -188,7 +192,7 @@ export default function MainContent(): JSX.Element {
             <button
               onClick={() => {
                 handleSubmitComment(snap.id, commentBody);
-                setEditPaste(!editPaste);
+                setEditSnipSnap(!editSnipSnap);
               }}
             >
               📩
@@ -223,15 +227,15 @@ export default function MainContent(): JSX.Element {
   };
 
   useEffect(() => {
-    getPastes();
+    getSnipSnaps();
     getAllComments();
   }, [allData.length, allComments.length]);
 
-  //GET pasteBins from API
-  const getPastes = async () => {
-    console.log("getPastes works");
+  //GET snipSnaps from API
+  const getSnipSnaps = async () => {
+    console.log("getSnipSnaps works");
     try {
-      const response = await axios.get(url + "/pastes");
+      const response = await axios.get(url + "/snip_snaps");
       setAllData(response.data);
     } catch (error) {
       console.error("Woops... issue with GET request: ", error);
@@ -248,14 +252,17 @@ export default function MainContent(): JSX.Element {
     }
   };
 
-  //POST pastes to API
-  const postPastes = async (newBody: string, newTitle?: string) => {
-    console.log("postPastes function is running!");
+  //POST snip snaps to API
+  const postSnipSnaps = async (newBody: string, newTitle?: string) => {
+    console.log("postSnipSnaps function is running!");
     try {
       if (newBody.length < 1) {
         alert("You can't post an empty snap bruh😂😂😂");
       } else {
-        await axios.post(url + "/pastes", { body: newBody, title: newTitle });
+        await axios.post(url + "/snip_snaps", {
+          body: newBody,
+          title: newTitle,
+        });
       }
     } catch (error) {
       console.error("Woops... issue with POST request: ", error);
@@ -263,27 +270,27 @@ export default function MainContent(): JSX.Element {
   };
   const handlePost = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    pasteBinTitle === ""
-      ? postPastes(pasteBinBody)
-      : postPastes(pasteBinBody, pasteBinTitle).then(() => getPastes());
-    setPasteBinBody("");
-    setPasteBinTitle("");
+    snipSnapTitle === ""
+      ? postSnipSnaps(snipSnapBody)
+      : postSnipSnaps(snipSnapBody, snipSnapTitle).then(() => getSnipSnaps());
+    setSnipSnapBody("");
+    setSnipSnapTitle("");
   };
 
-  //this is the edit request to edit a paste
-  const putEditedPaste = async (id: number, editedMessage: string) => {
+  //this is the edit request to edit a snip snap
+  const putEditedSnipSnap = async (id: number, editedMessage: string) => {
     try {
-      axios.put(`${url}/pastes`, { body: editedMessage, id: id });
+      axios.put(`${url}/snip_snaps`, { body: editedMessage, id: id });
     } catch (error) {
       console.log("failed to carry out request");
     }
   };
 
   //this function handles
-  const handleSubmitEditPaste = (id: number, message: string) => {
-    putEditedPaste(id, message)
-      .then(() => getPastes())
-      .then(() => getPastes());
+  const handleSubmitEditSnipSnap = (id: number, message: string) => {
+    putEditedSnipSnap(id, message)
+      .then(() => getSnipSnaps())
+      .then(() => getSnipSnaps());
   };
 
   return (
@@ -297,14 +304,14 @@ export default function MainContent(): JSX.Element {
           className="input-title"
           placeholder="title"
           type="text"
-          value={pasteBinTitle}
-          onChange={(e) => setPasteBinTitle(e.target.value)}
+          value={snipSnapTitle}
+          onChange={(e) => setSnipSnapTitle(e.target.value)}
         />
         <textarea
           className="input-body"
-          placeholder="Type your paste..."
-          value={pasteBinBody}
-          onChange={(e) => setPasteBinBody(e.target.value)}
+          placeholder="Type your snip snap..."
+          value={snipSnapBody}
+          onChange={(e) => setSnipSnapBody(e.target.value)}
         ></textarea>
         <button type="submit" className="submit-button">
           Post
@@ -318,7 +325,7 @@ export default function MainContent(): JSX.Element {
               key={el.id}
               snap={el}
               allCommProps={allComments}
-              handleSubmitEditPaste={handleSubmitEditPaste}
+              handleSubmitEditSnipSnap={handleSubmitEditSnipSnap}
             />
           ))}
         </>
