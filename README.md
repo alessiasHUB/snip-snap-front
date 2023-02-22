@@ -1,3 +1,3 @@
 # Snip Snap
 
-[Deployed Link](https://snip-snap-pro.netlify.app/).
+[Deployed Link](https://snip-snaps.netlify.app/).
